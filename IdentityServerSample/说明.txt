@@ -1,0 +1,210 @@
+打开命令面板 
+ctrl + p
+
+使用nuget(前提是已经安装了nuget)
+命令面板中输入： >nuget
+
+=====================================================================================
+认证端 IdentityServerCenter
+
+1、安装包IdentityServer4
+<PackageReference Include="IdentityServer4" Version="2.3.0-preview1-update2"/>
+
+2、设置自己添加的配置文件Config.cs
+using IdentityServer4.Models;
+定义有哪些资源Resources
+定义有哪些客户Clients，并指定各个Client的访问方式以及可用的资源
+
+
+3、Startup.cs
+将Config.cs中的定义注入到服务中
+using IdentityServer4;
+...
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddIdentityServer()
+            .AddDeveloperSigningCredential()
+            .AddInMemoryApiResources(Config.GetResources())
+            .AddInMemoryClients(Config.GetClients());
+    services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);   
+
+}
+
+public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+{
+    //...
+    app.UseIdentityServer();
+}
+
+
+4、Program.cs中定义一个访问地址
+
+ public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+    WebHost.CreateDefaultBuilder(args)
+        .UseUrls("http://localhost:5000")
+        .UseStartup<Startup>();
+
+=============================================================================
+资源端 ClientCredentialApi
+
+1、安装包IdentityServer4.AccessTokenValidation，不需要全部安装IdentityServer
+<PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.7.0-preview1"/>
+
+2、资源api(此处为ValuesController)中设置需要授权才能访问
+using Microsoft.AspNetCore.Authorization;
+...
+[Authorize]
+[Route("api/[controller]")]
+[ApiController]
+public class ValuesController : ControllerBase
+{...}
+
+
+3、Startup.cs
+设置认证地址、资源名称
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddAuthentication("Bearer")
+    .AddIdentityServerAuthentication(options =>
+        {
+            options.Authority="http://localhost:5000";
+            options.RequireHttpsMetadata = false;
+            options.ApiName = "api";
+
+        }
+    );
+    services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+}
+
+public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+{
+    ...
+    app.UseAuthentication();
+    app.UseMvc();
+}
+
+
+4、Program.cs中设置访问地址
+public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+    WebHost.CreateDefaultBuilder(args)
+        .UseUrls("http://localhost:5001")
+        .UseStartup<Startup>();
+
+===================================================================
+从认证端获取token
+http://localhost:5000/.well-known/openid-configuration
+这个地址中给出了IdentityServer的一些配置情况说明
+可以从下面的这个地址获取token
+http://localhost:5000/connect/token
+可以使用insomnia或者postman工具使用post方式访问这个地址
+
+1> 如果是客户端模式
+其中Body中的设置如下：
+ client_id:client
+ client_secret:secret
+ grant_type:client_credentials
+ 因为这些是我们在认证端定义好的
+结果如下：
+{
+	"access_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjRjY2M3NDEzYjkxNmI0MTIwMzMxZDJiZTZkMmJjNTc2IiwidHlwIjoiSldUIn0.eyJuYmYiOjE1Mzg3MzYyMDQsImV4cCI6MTUzODczOTgwNCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo1MDAwIiwiYXVkIjpbImh0dHA6Ly9sb2NhbGhvc3Q6NTAwMC9yZXNvdXJjZXMiLCJhcGkiXSwiY2xpZW50X2lkIjoiY2xpZW50Iiwic2NvcGUiOlsiYXBpIl19.qTsQycanctseCwDVjbMcZtgDVGDz1epjOclfhtkYw9LtAaOpRxWGsLY7Stzr6XFPO768VFkWsdMDOW5VqQN8XuM77lFpCWiksp8tRNaATvjdvkN7v0a9ex9ZGVOza_H2lfRXIyBwEPOdc0lMPMHNO6WTq3Bh0gOtyFG9OzE_KFovzicOmqO5qykyJjAUGQTr7G-KYX1pnYyTd4uNpanqRaIgLFYhYcD6Ej5oI4v6f0gWeqwurGtDimTZzoEMyvG7TSvggumZtjrdDaVlqr5-vrmE3KlP6tviOKoPbpBDvR8bKMhpwvWjQsnyxd6hRYZRnjEALDO7w613Y94ppooX2A",
+	"expires_in": 3600,
+	"token_type": "Bearer"
+}
+
+2> 密码模式
+其中Body中的设置如下：
+ client_id:pwdClient
+ client_secret:secret
+ grant_type:password
+ username:test
+ password:123456
+ 这些是我们在认证端定义好的
+如果不想传递client_secret，可以在认证端的Config.cs中的相应设置中
+RequireClientSecret=false
+
+================================================================
+使用获取到的token访问资源
+资源地址：
+http://localhost:5001/api/values
+可以使用insomnia或者postman工具
+访问时需要设置Headers 
+ Authorization:
+ Bearer + 上面的token(没有引号，Bearer和token用空格分开即可)
+
+ ====================================================================
+ 上面是使用工具访问
+ 此处使用第三方控制台程序来获取token并通过获取的token访问资源
+此处为客户端模式，参见ThirdPartyDemo
+
+1、安装包IdentityModel
+<PackageReference Include="IdentityModel" Version="3.10.0"/>
+
+2、关键代码
+using IdentityModel.Client;
+using System.Net.Http;
+....
+
+static void Main(string[] args)
+{
+    //获取tokon部分
+    // 1>发现认证端
+    var diso = DiscoveryClient.GetAsync("http://localhost:5000").Result;
+    if(diso.IsError)
+    {
+        Console.WriteLine(diso.Error);
+    }
+
+    // 2> 实例化TokenClient，注意这里要指定客户ID与secret
+    var tokenClient=new TokenClient(diso.TokenEndpoint,"client","secret");
+    // 3> 使用TokenClient获取token，注意这里指定资源范围
+    var tokenResponse = tokenClient.RequestClientCredentialsAsync("api").Result;
+    if(tokenResponse.IsError)
+    {
+        Console.WriteLine(tokenResponse.Error);
+    }
+    else
+    {
+        Console.WriteLine(tokenResponse.Json);
+    }
+
+    //访问资源部分
+    // 1> 实例化HttpClient    
+    var httpClient = new HttpClient();
+    // 2> 设置token
+    httpClient.SetBearerToken(tokenResponse.AccessToken);
+    // 3> 使用HttpClient访问服务端获取资源
+    var response = httpClient.GetAsync("http://localhost:5000/api/values").Result;
+    if(response.IsSuccessStatusCode)
+    {
+        Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+    }
+
+    Console.ReadLine();
+    
+}
+
+===================================================================
+使用控制台程序来获取token并通过获取的token访问资源
+密码模式，具体参见PwdClient
+关键代码如下：
+var tokenClient=new TokenClient(diso.TokenEndpoint,"pwdClient","secret");            
+var tokenResponse = tokenClient.RequestResourceOwnerPasswordAsync("test","123456").Result;
+其他代码同上
+
+=================================================================================
+关于.netcore2.1环境自定义Identity用法：
+VS2017：
+1、新建MVC项目，含控制器和视图，无身份认证，取消https支持
+2、项目名称，右键-->添加-->新搭建基架的项目
+3、左侧选择“标识”，选择标识。（即英文版Identity）
+4、选择：布局页（即_Layout.cshtml）。PS：选了也没用，它不会添加登录注册导航的partial.cshtml，需要稍后你自己添加。复选框：全部勾选。数据库连接上下文：点击加号自建，前面路径保留，名称建议用ApplicationDbContext。用户类：点加号新建，名称建议用ApplicationUser。确定。
+5、处理完毕，所有Identity文件都在Areas文件夹里。
+6、在程序包管理控制台(In the Visual Studio Package Manager Console)执行以下命令:
+Add-Migration InitIdentitySchema
+Update-Database
+7、修改_Layout.cshtml,，在导航栏部分</ul>后加上<partial name="_LoginPartial" />。引入Identity的partial视图。
+8 修改startup.cs,在Configure方法的app.UseMVC前加入：app.UseAuthentication();
+否则Cookie不生效。
+
+根据需要控制Identity内容，参考：https://docs.microsoft.com/en-us/aspnet/core/security/authentication/scaffold-identity?view=aspnetcore-2.1&tabs=visual-studio
+同类问题请翻阅该页Feedback。
