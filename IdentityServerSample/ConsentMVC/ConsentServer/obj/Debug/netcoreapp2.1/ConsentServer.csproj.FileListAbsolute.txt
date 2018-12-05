@@ -33,3 +33,4 @@ G:\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\netcorea
 G:\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\netcoreapp2.1\Razor\Views\Admin\Index.g.cshtml.cs
 G:\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\netcoreapp2.1\Razor\Views\Account\Register.g.cshtml.cs
 G:\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\netcoreapp2.1\Razor\Views\Account\Login.g.cshtml.cs
+G:\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\netcoreapp2.1\Razor\Views\Consent\_ScopeListItem.g.cshtml.cs

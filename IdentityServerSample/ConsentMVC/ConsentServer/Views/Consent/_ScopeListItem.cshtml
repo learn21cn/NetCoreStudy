@@ -1,0 +1,35 @@
+﻿
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@using ConsentServer.ViewModels;
+@model ScopeViewModel
+
+<li>
+    <div>
+        <input type="checkbox" 
+               name="ScopesConsented" 
+               id="scopes_@Model.Name"
+               checked="@Model.Checked"
+               disabled="@Model.Required"
+               value="@Model.Name" />
+        @if (Model.Required)
+        {
+            <input type="hidden" name="ScopesConsented" value="@Model.Name"/>
+        }
+
+        <strong>@Model.Name</strong>
+        @if (Model.Emphasize)
+        {
+            <span class="glyphicon glyphicon-exclamation-sign"></span> 
+        }
+    </div>
+    @if (string.IsNullOrEmpty(Model.Description))
+    {
+        <div>
+            <label for="scopes_@Model.Name">@Model.Description</label>
+        </div>
+    }
+
+</li>
