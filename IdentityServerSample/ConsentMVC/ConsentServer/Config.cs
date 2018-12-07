@@ -28,26 +28,49 @@ namespace ConsentServer
                 new Client
                 {
                     ClientId="mvc",
-                    AllowedGrantTypes=GrantTypes.Implicit,
+                    ClientName="Mvc Client",
+                    ClientUri="http://localhost:5001",
+                    LogoUri="https://chocolatey.org/content/packageimages/dotnetcore-vs.2.0.3-Preview.png",
+                    AllowRememberConsent=true,
+                    //AllowedGrantTypes=GrantTypes.Implicit,
+                    AllowedGrantTypes=GrantTypes.HybridAndClientCredentials,
                     ClientSecrets={new Secret("secret".Sha256())},
+                    AllowOfflineAccess=true,
+                    AllowAccessTokensViaBrowser=true,
 
-                    //运行访问的范围
-                    AllowedScopes=
-                    {
-                        IdentityServerConstants.StandardScopes.Profile,
-                        IdentityServerConstants.StandardScopes.OpenId
-                    },
-
+                    //是否需要用户点击登录
+                    RequireConsent =false,
                     //跳转登录到的客户端的地址
                     RedirectUris={ "http://localhost:5001/signin-oidc"},
                     //跳转登出到的客户端的地址
                     PostLogoutRedirectUris={ "http://localhost:5001/signout-callback-oidc" },
 
-                    //是否需要用户点击登录
-                    RequireConsent =false
+                    AlwaysIncludeUserClaimsInIdToken=true,
 
-
+                    //运行访问的范围
+                    AllowedScopes=
+                    {
+                        IdentityServerConstants.StandardScopes.Profile,
+                        IdentityServerConstants.StandardScopes.OpenId,
+                        IdentityServerConstants.StandardScopes.Email,
+                        IdentityServerConstants.StandardScopes.OfflineAccess,
+                        "api1"
+                    }  
+                    
                 }
+            };
+        }
+
+     
+
+        public static IEnumerable<IdentityResource> GetIdentityResources()
+        {
+            return new List<IdentityResource>
+            {
+                new OpenId(),
+                new Profile(),
+                new Email()
+
             };
         }
 
@@ -60,21 +83,10 @@ namespace ConsentServer
                 {
                     SubjectId="1",
                     Username="test@yahoo.com",
-                    
+
                     Password="password"
-                    
+
                 }
-            };
-        }
-
-        public static IEnumerable<IdentityResource> GetIdentityResources()
-        {
-            return new List<IdentityResource>
-            {
-                new OpenId(),
-                new Profile(),
-                new Email()
-
             };
         }
     }
