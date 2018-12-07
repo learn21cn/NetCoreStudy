@@ -27,17 +27,19 @@ namespace ConsentServer.Services
         {
             var rememberConsent = model?.RememberConsent ?? true;
             var selectedScopes = model?.ScopesConsented ?? Enumerable.Empty<string>();
-            var vm = new ConsentViewModel();
-            vm.ClientName = client.ClientName;
-            vm.ClientLogoUrl = client.LogoUri;
-            vm.RememberConsent = rememberConsent;
+            var vm = new ConsentViewModel
+            {
+                ClientName = client.ClientName,
+                ClientLogoUrl = client.LogoUri,
+                RememberConsent = rememberConsent,
 
-            vm.IdentityScopes = resources.IdentityResources.Select(i => CreatScopeViewModel(i,selectedScopes.Contains(i.Name)|| model==null));
-            vm.ResourceScopes = resources.ApiResources.SelectMany(i => i.Scopes).Select(x=>CreatScopeViewModel(x,selectedScopes.Contains(x.Name)|| model==null));
+                IdentityScopes = resources.IdentityResources.Select(i => CreateScopeViewModel(i, selectedScopes.Contains(i.Name) || model == null)),
+                ResourceScopes = resources.ApiResources.SelectMany(i => i.Scopes).Select(x => CreateScopeViewModel(x, selectedScopes.Contains(x.Name) || model == null))
+            };           
             return vm;
         }
 
-        private ScopeViewModel CreatScopeViewModel(IdentityResource identityResource, bool check)
+        private ScopeViewModel CreateScopeViewModel(IdentityResource identityResource, bool check)
         {
             return new ScopeViewModel
             {
@@ -50,7 +52,7 @@ namespace ConsentServer.Services
             };
         }
 
-        private ScopeViewModel CreatScopeViewModel(Scope scope, bool check)
+        private ScopeViewModel CreateScopeViewModel(Scope scope, bool check)
         {
             return new ScopeViewModel
             {
@@ -65,6 +67,59 @@ namespace ConsentServer.Services
 
         #endregion
 
+        public async Task<ConsentViewModel> BuildConsentViewModel(string returnUrl, InputConsentViewModel model=null)
+        {
+            var request = await _identityServerInteractionService.GetAuthorizationContextAsync(returnUrl);
+            if (request == null)
+            {
+                return null;
+            }
+            var client = await _clientStore.FindEnabledClientByIdAsync(request.ClientId);
+            var resources = await _resourceStore.FindEnabledResourcesByScopeAsync(request.ScopesRequested);
 
+            var vm = CreateConsentViewModel(request,client,resources,model);
+            vm.ReturnUrl = returnUrl;
+            return vm;
+
+        }
+
+        public async Task<ProcessConsentResult> ProcessConsent(InputConsentViewModel viewModel)
+        {
+            ConsentResponse consentResponse = null;
+            var result = new ProcessConsentResult();
+            if (viewModel.Button == "no")
+            {
+                consentResponse = ConsentResponse.Denied;
+            }
+            else if (viewModel.Button == "yes")
+            {
+                if (viewModel.ScopesConsented != null && viewModel.ScopesConsented.Any())
+                {
+                    consentResponse = new ConsentResponse
+                    {
+                        RememberConsent = viewModel.RememberConsent,
+                        ScopesConsented=viewModel.ScopesConsented
+                    };
+                }
+
+                result.ValidationError = "至少选中一个权限";
+            }
+
+            if (consentResponse != null)
+            {
+                var request = await _identityServerInteractionService.GetAuthorizationContextAsync(viewModel.ReturnUrl);
+                await _identityServerInteractionService.GrantConsentAsync(request, consentResponse);
+
+                result.RedirectUrl = viewModel.ReturnUrl;
+            }
+
+            {
+                var consentViewModel = await BuildConsentViewModel(viewModel.ReturnUrl, viewModel);
+                result.ViewModel = consentViewModel;
+
+            }
+            return result;
+
+        }
     }
 }
