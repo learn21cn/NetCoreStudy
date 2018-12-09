@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28010.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsentServer", "ConsentServer\ConsentServer.csproj", "{E2A46352-4679-407A-A667-B508A44E5F9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CensentClient", "CensentClient\CensentClient.csproj", "{4C0BFC96-3B7D-41D7-BF80-AEFF50C15562}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsentClient", "ConsentClient\ConsentClient.csproj", "{556E738D-D4C6-4586-9F30-DB5C58B09A16}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{E2A46352-4679-407A-A667-B508A44E5F9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2A46352-4679-407A-A667-B508A44E5F9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E2A46352-4679-407A-A667-B508A44E5F9E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4C0BFC96-3B7D-41D7-BF80-AEFF50C15562}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4C0BFC96-3B7D-41D7-BF80-AEFF50C15562}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4C0BFC96-3B7D-41D7-BF80-AEFF50C15562}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4C0BFC96-3B7D-41D7-BF80-AEFF50C15562}.Release|Any CPU.Build.0 = Release|Any CPU
+		{556E738D-D4C6-4586-9F30-DB5C58B09A16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{556E738D-D4C6-4586-9F30-DB5C58B09A16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{556E738D-D4C6-4586-9F30-DB5C58B09A16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{556E738D-D4C6-4586-9F30-DB5C58B09A16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

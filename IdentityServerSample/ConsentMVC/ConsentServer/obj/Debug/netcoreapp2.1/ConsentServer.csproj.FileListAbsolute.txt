@@ -2,7 +2,6 @@ G:\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\bin\Debug\netcorea
 G:\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\bin\Debug\netcoreapp2.1\ConsentServer.runtimeconfig.json
 G:\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\bin\Debug\netcoreapp2.1\ConsentServer.runtimeconfig.dev.json
 G:\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\bin\Debug\netcoreapp2.1\ConsentServer.dll
-G:\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\netcoreapp2.1\ConsentServer.csprojAssemblyReference.cache
 G:\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\netcoreapp2.1\ConsentServer.csproj.CoreCompileInputs.cache
 G:\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\netcoreapp2.1\ConsentServer.RazorAssemblyInfo.cache
 G:\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\netcoreapp2.1\ConsentServer.RazorAssemblyInfo.cs
@@ -71,3 +70,4 @@ I:\source\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\n
 I:\source\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\netcoreapp2.1\ConsentServer.dll
 I:\source\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\netcoreapp2.1\ConsentServer.pdb
 I:\source\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\netcoreapp2.1\ConsentServer.csproj.CopyComplete
+G:\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\netcoreapp2.1\Razor\Views\Consent\Index.g.cshtml.cs

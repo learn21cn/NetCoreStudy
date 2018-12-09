@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ConsentServer.Models;
 using ConsentServer.ViewModels;
+using IdentityServer4.Services;
 using IdentityServer4.Test;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -12,10 +14,15 @@ namespace ConsentServer.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly TestUserStore _users;
-        public AccountController(TestUserStore users)
+        private UserManager<ApplicationUser> _userManager;
+        private SignInManager<ApplicationUser> _signInManager;
+        private IIdentityServerInteractionService _identityServerInteractionService;
+
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IIdentityServerInteractionService identityServerInteractionService)
         {
-            this._users = users;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _identityServerInteractionService = identityServerInteractionService;
         }
 
         //内部跳转
@@ -30,7 +37,7 @@ namespace ConsentServer.Controllers
         }
 
         //添加验证错误
-        private void AddError(IdentityResult result)
+        private void AddErrors(IdentityResult result)
         {
             foreach (var error in result.Errors)
             {
@@ -44,18 +51,45 @@ namespace ConsentServer.Controllers
             return View();
         }
 
-        //public IActionResult Login(string returnUrl = null)
-        //{
-        //    ViewData["returnUrl"] = returnUrl;
-        //    return View();
-        //}
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterViewModel registerViewModel,string returnUrl=null)
+        {
+            if (ModelState.IsValid)
+            {
+                ViewData["ReturnUrl"] = returnUrl;
+                var identityUser = new ApplicationUser
+                {
+                    Email=registerViewModel.Email,
+                    UserName=registerViewModel.Email,
+                    NormalizedUserName=registerViewModel.Email
+                };
+                var identityResult = await _userManager.CreateAsync(identityUser, registerViewModel.Passworld);
+                if (identityResult.Succeeded)
+                {
+                    await _signInManager.SignInAsync(identityUser, new AuthenticationProperties { IsPersistent = true });
+                    return RedirectToLocal(returnUrl);
+                }
+                else
+                {
+                    AddErrors(identityResult);
+                }
+            }
+            return View();
+        }        
 
-        public async Task<IActionResult> Login(LoginViewModel loginViewModel, string returnUrl = null)
+        public IActionResult Login(string returnUrl = null)
+        {
+            ViewData["returnUrl"] = returnUrl;
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel loginViewModel, string returnUrl)
         {
             if (ModelState.IsValid)
             {
                 ViewData["returnUrl"] = returnUrl;
-                var user = _users.FindByUsername(loginViewModel.Email);
+                var user = await _userManager.FindByEmailAsync(loginViewModel.Email);
 
                 if (user == null)
                 {
@@ -63,22 +97,32 @@ namespace ConsentServer.Controllers
                 }
                 else
                 {
-                    if (_users.ValidateCredentials(loginViewModel.Email, loginViewModel.Password))
+                    if (await _userManager.CheckPasswordAsync(user, loginViewModel.Password))
                     {
-                        var prop = new AuthenticationProperties
+                        AuthenticationProperties props = null;
+                        if (loginViewModel.RememberMe)
                         {
-                            IsPersistent = true,
-                            ExpiresUtc = DateTimeOffset.UtcNow.Add(TimeSpan.FromMinutes(30))
-                        };
+                            props = new AuthenticationProperties
+                            {
+                                IsPersistent = true,
+                                ExpiresUtc = DateTimeOffset.UtcNow.Add(TimeSpan.FromMinutes(30))
+                            };
+                        }
 
-                        await Microsoft.AspNetCore.Http.AuthenticationManagerExtensions.SignInAsync(HttpContext, user.SubjectId, user.Username, prop);
+                        await _signInManager.SignInAsync(user, props);
+                        if (_identityServerInteractionService.IsValidReturnUrl(returnUrl))
+                        {
+                            return Redirect(returnUrl);
+                        }
+
+                        return Redirect("~/");
                     }
-
-                }
-                return RedirectToLocal(returnUrl);
+                    ModelState.AddModelError(nameof(loginViewModel.Password), "Wrong Password");
+                }              
 
             }
-            return View();
+           
+            return View(loginViewModel);
         }
 
         public async Task<IActionResult> Logout()

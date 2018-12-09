@@ -18,6 +18,7 @@ using ConsentServer.Models;
 using Microsoft.AspNetCore.Identity;
 using IdentityServer4.Services;
 using ConsentServer.Services;
+using ConsentServer.Data;
 
 namespace ConsentServer
 {
@@ -33,15 +34,17 @@ namespace ConsentServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            const string connectionString = @"Server=(localdb)\ProjectsV13;Database=IdentityServer4.Quickstrat.EF2.1;Trusted_Connection=True;MultipleActiveResultSets=true";
+            //const string connectionString = @"Server=(localdb)\ProjectsV13;Database=IdentityServer4.Quickstart.EF2.1;Trusted_Connection=True;MultipleActiveResultSets=true";
+            const string connectionString = @"Server=(localdb)\mssqllocaldb; Database=OidcServer;Trusted_Connection=True;MultipleActiveResultSets=true";
 
             var migrationAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
-            //services.AddDbContext<ApplicationDbContext>(options => {
-            //    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
-            //});
+            services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            });
 
             services.AddIdentity<ApplicationUser, ApplicationUserRole>()
-                //.AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
             //services.Configure<CookiePolicyOptions>(options =>
@@ -73,7 +76,9 @@ namespace ConsentServer
                            sql => sql.MigrationsAssembly(migrationAssembly));
                     };
                 })
-                //.AddAspNetIdentity<ApplicationUser>()
+                //需要安装包IdentityServer4.AspNetIdentity
+                .AddAspNetIdentity<ApplicationUser>()
+
                 .Services.AddScoped<IProfileService, ProfileService>();
 
             services.Configure<IdentityOptions>(options=>
@@ -84,6 +89,7 @@ namespace ConsentServer
                 options.Password.RequiredLength = 6;
             });
 
+            services.AddScoped<Services.ConsentService>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 

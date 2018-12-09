@@ -39,7 +39,7 @@ namespace ConsentServer
                     AllowAccessTokensViaBrowser=true,
 
                     //是否需要用户点击登录
-                    RequireConsent =false,
+                    RequireConsent =true,
                     //跳转登录到的客户端的地址
                     RedirectUris={ "http://localhost:5001/signin-oidc"},
                     //跳转登出到的客户端的地址
