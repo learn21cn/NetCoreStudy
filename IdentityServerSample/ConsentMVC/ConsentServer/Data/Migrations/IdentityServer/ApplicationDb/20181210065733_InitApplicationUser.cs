@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace ConsentServer.Migrations
+namespace ConsentServer.Data.Migrations.IdentityServer.ApplicationDb
 {
     public partial class InitApplicationUser : Migration
     {

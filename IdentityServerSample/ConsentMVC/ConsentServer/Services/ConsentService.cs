@@ -112,7 +112,7 @@ namespace ConsentServer.Services
 
                 result.RedirectUrl = viewModel.ReturnUrl;
             }
-
+            
             {
                 var consentViewModel = await BuildConsentViewModel(viewModel.ReturnUrl, viewModel);
                 result.ViewModel = consentViewModel;

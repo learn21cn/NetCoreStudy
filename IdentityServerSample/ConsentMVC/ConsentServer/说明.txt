@@ -7,7 +7,7 @@ Add-Migration InitPersistedGrant -Context PersistedGrantDbContext -OutputDir Dat
 Update-Database -Context ConfigurationDbContext 
 Update-Database -Context PersistedGrantDbContext
 
-Add-Migration InitApplicationUser -Context ApplicationDbContext
+Add-Migration InitApplicationUser -Context ApplicationDbContext -OutputDir Data\Migrations\IdentityServer\ApplicationDb
 Update-Database -Context ApplicationDbContext
 
 
@@ -34,3 +34,10 @@ options.ClaimActions.MapCustomJson("role", n => n["role"].ToString());
 new Clinet内：
 
 AlwaysIncludeUserClaimsInIdToken = true,
+
+
+
+dotnet ef migrations add InitApplicationUser --context ApplicationDbContext
+
+dotnet ef database update
+

@@ -47,7 +47,7 @@ namespace ConsentServer.Controllers
 
         public IActionResult Register(string returnUrl=null)
         {
-            ViewData["returnUrl"] = returnUrl;
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
@@ -79,7 +79,7 @@ namespace ConsentServer.Controllers
 
         public IActionResult Login(string returnUrl = null)
         {
-            ViewData["returnUrl"] = returnUrl;
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
@@ -88,12 +88,11 @@ namespace ConsentServer.Controllers
         {
             if (ModelState.IsValid)
             {
-                ViewData["returnUrl"] = returnUrl;
+                ViewData["ReturnUrl"] = returnUrl;
                 var user = await _userManager.FindByEmailAsync(loginViewModel.Email);
-
                 if (user == null)
                 {
-                    ModelState.AddModelError(nameof(loginViewModel.Email), "UserName not exists");
+                    ModelState.AddModelError(nameof(loginViewModel.Email), "Email not exists");
                 }
                 else
                 {
@@ -115,19 +114,22 @@ namespace ConsentServer.Controllers
                             return Redirect(returnUrl);
                         }
 
+                        
                         return Redirect("~/");
+
+
                     }
                     ModelState.AddModelError(nameof(loginViewModel.Password), "Wrong Password");
-                }              
-
+                }
             }
-           
+
             return View(loginViewModel);
         }
+        
 
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync();
+            await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
     }

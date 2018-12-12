@@ -67,9 +67,9 @@ namespace ConsentServer
         {
             return new List<IdentityResource>
             {
-                new OpenId(),
-                new Profile(),
-                new Email()
+                new IdentityResources.OpenId(),
+                new IdentityResources.Profile(),
+                new IdentityResources.Email()
 
             };
         }

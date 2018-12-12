@@ -53,18 +53,20 @@ namespace ConsentClient
 
                 options.ClientId = "mvc";
                 options.ClientSecret = "secret";
+                options.ResponseType = "code id_token";
                 options.SaveTokens = true;
 
                 //options.GetClaimsFromUserInfoEndpoint = true;
-                //options.ClaimActions.MapJsonKey("sub","sub");
+                //options.ClaimActions.MapJsonKey("sub", "sub");
                 //options.ClaimActions.MapJsonKey("preferred_username", "preferred_username");
                 //options.ClaimActions.MapJsonKey("avatar", "avatar");
-                //options.ClaimActions.MapCustomJson("role", n=>n["role"].ToString());
-                
+                //options.ClaimActions.MapCustomJson("role", n => n["role"].ToString());
+
 
                 options.Scope.Add("offline_access");
                 options.Scope.Add("openid");
                 options.Scope.Add("profile");
+                options.Scope.Add("api1");
 
             });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
