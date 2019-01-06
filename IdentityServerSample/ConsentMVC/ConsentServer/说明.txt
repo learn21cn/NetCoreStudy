@@ -4,7 +4,7 @@ Add-Migration InitPersistedGrant -Context PersistedGrantDbContext -OutputDir Dat
 
 注意 DBcontext 是在 Identityserver4.EntityFramwork.DbContexts 命名空间下
 生成数据库
-Update-Database -Context ConfigurationDbContext 
+Update-Database -Context ConfigurationDbContext
 Update-Database -Context PersistedGrantDbContext
 
 Add-Migration InitApplicationUser -Context ApplicationDbContext -OutputDir Data\Migrations\IdentityServer\ApplicationDb
@@ -12,32 +12,23 @@ Update-Database -Context ApplicationDbContext
 
 
 服务端Config.cs，client配置，GrantType要选择：
-
-AllowedGrantTypes = GrantTypes.HybridAndClientCredentials,
- 
+AllowedGrantTypes = GrantTypes.HybridAndClientCredentials, 
 
 第一种方法：
-
 客户端Startup.cs:
-
 位于：.addOPenIdConnect("oidc",options =>)内：                
 options.GetClaimsFromUserInfoEndpoint = true;
 options.ClaimActions.MapJsonKey("preferred_username", "preferred_username");
 options.ClaimActions.MapJsonKey("avatar", "avatar");
-options.ClaimActions.MapCustomJson("role", n => n["role"].ToString());
-
- 
+options.ClaimActions.MapCustomJson("role", n => n["role"].ToString()); 
 
 第二种方法：
-
 服务端Config.cs:
 new Clinet内：
-
 AlwaysIncludeUserClaimsInIdToken = true,
 
 
-
+命令行模式
 dotnet ef migrations add InitApplicationUser --context ApplicationDbContext
-
 dotnet ef database update
 

@@ -71,3 +71,4 @@ I:\source\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\n
 I:\source\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\netcoreapp2.1\ConsentServer.pdb
 I:\source\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\netcoreapp2.1\ConsentServer.csproj.CopyComplete
 G:\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\netcoreapp2.1\Razor\Views\Consent\Index.g.cshtml.cs
+G:\NetCoreStudy\IdentityServerSample\ConsentMVC\ConsentServer\obj\Debug\netcoreapp2.1\ConsentServer.csprojAssemblyReference.cache
